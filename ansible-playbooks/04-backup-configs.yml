@@ -1,0 +1,26 @@
+---
+- name: Backup configuration files
+  hosts: ubuntu_vm
+  become: true
+
+  vars:
+    backup_dir: "/home/user/backups/{{ ansible_date_time.date }}"
+    files_to_backup:
+      - /etc/ssh/sshd_config
+      - /etc/nginx/nginx.conf
+      - /etc/hosts
+
+  tasks:
+    - name: Create backup directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy each configuration file to the backup directory
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ backup_dir }}/"
+        remote_src: true
+      loop: "{{ files_to_backup }}"
+      ignore_errors: true
