@@ -1,0 +1,23 @@
+---
+- name: Add the user and configure access rights
+  hosts: ubuntu_vm
+  become: true
+
+  tasks:
+    - name: Create new user with password
+      ansible.builtin.user:
+        name: newadmin
+        groups: root,sudo
+        append: true
+        password: "{{ '123' | password_hash('sha512') }}"
+        shell: /bin/bash
+        state: present
+
+    - name: Verify user creation
+      ansible.builtin.command: id newadmin
+      register: user_info
+      changed_when: false
+
+    - name: Display user information
+      ansible.builtin.debug:
+        msg: "User created successfully: {{ user_info.stdout }}"

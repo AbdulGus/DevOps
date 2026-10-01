@@ -1,0 +1,29 @@
+---
+- name: Installing and Configuring the Nginx Web Server
+  hosts: NGINX
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Ensure Nginx is running and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Create a custom index.html
+      ansible.builtin.copy:
+        content: "<h1>Hello! My name is Student Name</h1>"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: "0644"
